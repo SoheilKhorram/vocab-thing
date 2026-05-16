@@ -86,7 +86,7 @@ export function WordForm() {
 
             <Field>
               <FieldLabel htmlFor="persian-translation">Persian Translation</FieldLabel>
-              <Input name="persian-translation" id="persian-translation" required />
+              <Input name="persian-translation" id="persian-translation" />
               <FieldDescription>Separate different meanings by &quot; - &quot;</FieldDescription>
             </Field>
           </div>
@@ -101,7 +101,7 @@ export function WordForm() {
       </FieldGroup>
 
       <Field orientation='horizontal' className="mt-auto justify-end">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" size="lg" disabled={isPending}>
           {isPending ? <Loader2 className="animate-spin" /> : <Save />}
           {isPending ? "Adding..." : "Add"}
         </Button>

@@ -10,11 +10,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { BookOpenText, CirclePlus, GalleryVerticalEndIcon } from "lucide-react"
+import { BookOpenText, CaseLower, CirclePlus, GalleryVerticalEndIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -25,6 +22,11 @@ const data = {
       title: "Lessons",
       icon: <BookOpenText />,
       url: "/lessons",
+    },
+    {
+      title: "Words",
+      icon: <CaseLower />,
+      url: "/words",
     },
     {
       title: "Add Word",
