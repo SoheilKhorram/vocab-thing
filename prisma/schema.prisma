@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Word {
+  id                  Int               @id @default(autoincrement())
+  englishTerm         String
+  persianTranslations String[]
+  partsOfSpeech       PartOfSpeech[]
+  exampleSentences    ExampleSentence[]
+  definitions         Definition[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+}
+
+model PartOfSpeech {
+  id     Int    @id @default(autoincrement())
+  value  String
+  label  String
+  wordId Int
+  word   Word   @relation(fields: [wordId], references: [id])
+}
+
+model ExampleSentence {
+  id      Int    @id @default(autoincrement())
+  content String
+  wordId  Int
+  word    Word   @relation(fields: [wordId], references: [id])
+}
+
+model Definition {
+  id      Int    @id @default(autoincrement())
+  content String
+  wordId  Int
+  word    Word   @relation(fields: [wordId], references: [id])
+}
