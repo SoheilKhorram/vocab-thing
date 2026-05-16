@@ -1,10 +1,12 @@
 'use client'
 
+import { deleteWordAction } from "@/app/actions/word-actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { DialogHeader, DialogDescription, DialogTitle, DialogContent, DialogTrigger, Dialog, DialogClose, DialogFooter } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { History, Minus, Pencil, Plus, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { History, Loader2, Minus, Pencil, Plus, Trash2 } from "lucide-react"
+import { useTransition } from "react"
 
 // Define the shape of the data we expect based on your Prisma schema
 type WordProps = {
@@ -16,11 +18,16 @@ type WordProps = {
 }
 
 export function WordCard({ word }: { word: WordProps }) {
-  // Local state for the counter (you can later wire this up to a Server Action to save to DB)
-  const [score, setScore] = useState(0)
+  const [isDeleting, startTransition] = useTransition()
 
-  // Grab the primary translation
-  // const mainTranslation = word.persianTranslations.join(" / ")
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteWordAction(word.id)
+      if (!result.success) {
+        alert(result.error)
+      }
+    })
+  }
 
   return (
     <div className="group flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm p-5 hover:border-border/80 transition-colors">
@@ -49,6 +56,9 @@ export function WordCard({ word }: { word: WordProps }) {
       <Separator className="self-end" />
       {/* Bottom Footer: Review Status & Controls */}
       <div className="flex mt-4 items-center justify-between">
+        <div className="flex gap-1">
+          hi
+        </div>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-50 transition-opacity ml-auto">
           <Button
             variant="ghost"
@@ -57,15 +67,40 @@ export function WordCard({ word }: { word: WordProps }) {
           >
             <Pencil className="h-3 w-3" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6.5 w-6.5 text-muted-foreground hover:text-destructive hover:opacity-100  rounded-md"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                disabled={isDeleting}
+                size="icon"
+                className="h-6.5 w-6.5 text-muted-foreground hover:text-destructive hover:opacity-100  rounded-md"
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (<Trash2 className="h-3 w-3" />)}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Delete word</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete the word?
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="ghost">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleDelete} variant="destructive" type="submit">
+                  {isDeleting && <Loader2 className="h-3 w-3 animate-spin" />}
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }

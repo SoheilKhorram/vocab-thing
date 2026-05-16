@@ -10,6 +10,7 @@ model Word {
   id                  Int               @id @default(autoincrement())
   englishTerm         String
   persianTranslations String[]
+  studyProgress       Int[]
   partsOfSpeech       PartOfSpeech[]
   exampleSentences    ExampleSentence[]
   definitions         Definition[]
@@ -22,19 +23,19 @@ model PartOfSpeech {
   value  String
   label  String
   wordId Int
-  word   Word   @relation(fields: [wordId], references: [id])
+  word   Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
 }
 
 model ExampleSentence {
   id      Int    @id @default(autoincrement())
   content String
   wordId  Int
-  word    Word   @relation(fields: [wordId], references: [id])
+  word    Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
 }
 
 model Definition {
   id      Int    @id @default(autoincrement())
   content String
   wordId  Int
-  word    Word   @relation(fields: [wordId], references: [id])
+  word    Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
 }

@@ -61,3 +61,19 @@ export async function createWordAction(data: CreateWordInput) {
     return { success: false, error: "Database error occurred" }
   }
 }
+
+export async function deleteWordAction(id: number) {
+  try {
+    await prisma.word.delete({
+      where: { id },
+    })
+
+    // Refresh the page so the deleted word disappears from the grid
+    revalidatePath('/words') // Note: Change this path if your page is located somewhere else (e.g., '/')
+
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to delete word:", error)
+    return { success: false, error: "Could not delete word from database" }
+  }
+}
