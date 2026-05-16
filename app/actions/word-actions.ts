@@ -33,6 +33,7 @@ export async function createWordAction(data: CreateWordInput) {
       data: {
         englishTerm: data.englishTerm,
         persianTranslations: persianTranslationsArray,
+        studyProgress: [0,0,0,0,0,0,0,0,0,0,0],
         partsOfSpeech: {
           create: data.selectedParts.map((part) => ({
             value: part,
@@ -75,5 +76,24 @@ export async function deleteWordAction(id: number) {
   } catch (error) {
     console.error("Failed to delete word:", error)
     return { success: false, error: "Could not delete word from database" }
+  }
+}
+
+export async function updateWordProgressAction(id: number, studyProgress: number[]) {
+  try {
+    // Tell Prisma to update the specific word with the new progress array
+    await prisma.word.update({
+      where: { id },
+      data: { studyProgress }
+    })
+
+    // Clear the Next.js cache so the updated boxes show up immediately
+    revalidatePath('/words')
+    revalidatePath('/study', 'layout') // The 'layout' flag clears all dynamic /study/lesson/[id] routes too
+
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to update progress:", error)
+    return { success: false, error: "Failed to save study progress to database." }
   }
 }

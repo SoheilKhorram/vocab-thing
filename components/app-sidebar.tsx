@@ -19,9 +19,9 @@ import { usePathname } from "next/navigation"
 const data = {
   navMain: [
     {
-      title: "Lessons",
+      title: "Study",
       icon: <BookOpenText />,
-      url: "/lessons",
+      url: "/study",
     },
     {
       title: "Words",
