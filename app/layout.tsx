@@ -1,18 +1,29 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono, Nunito_Sans, Noto_Sans } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { cn } from "@/lib/utils"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-
-const notoSansHeading = Noto_Sans({ subsets: ['latin'], variable: '--font-heading' })
-
-const nunitoSans = Nunito_Sans({ subsets: ['latin'], variable: '--font-sans' })
+import localFont from "next/font/local"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+})
+
+const notoSansHeading = localFont({
+  src: "./fonts/NotoSans-Variable.ttf",
+  variable: "--font-heading",
+  weight: "100 900",
+  display: "swap",
+})
+
+const nunitoSans = localFont({
+  src: "./fonts/NunitoSans-Variable.ttf",
+  variable: "--font-sans",
+  weight: "200 1000",
+  display: "swap",
 })
 
 const geistMono = Geist_Mono({
