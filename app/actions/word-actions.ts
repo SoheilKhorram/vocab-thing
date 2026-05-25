@@ -63,6 +63,68 @@ export async function createWordAction(data: CreateWordInput) {
   }
 }
 
+type UpdateWordInput = {
+  id: number
+  englishTerm: string
+  persianTranslation: string
+  selectedParts: string[]
+  exampleSentences: string[]
+  definitions: string[]
+}
+
+export async function updateWordAction(data: UpdateWordInput) {
+  try {
+    const persianTranslationsArray = data.persianTranslation
+      .split("-")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0)
+
+    const cleanSentences = data.exampleSentences.filter(s => s.trim().length > 0)
+    const cleanDefinitions = data.definitions.filter(d => d.trim().length > 0)
+
+    await prisma.$transaction(async (tx) => {
+      // Delete old relations
+      await tx.partOfSpeech.deleteMany({ where: { wordId: data.id } })
+      await tx.exampleSentence.deleteMany({ where: { wordId: data.id } })
+      await tx.definition.deleteMany({ where: { wordId: data.id } })
+
+      // Update parent and insert new relations
+      await tx.word.update({
+        where: { id: data.id },
+        data: {
+          englishTerm: data.englishTerm,
+          persianTranslations: persianTranslationsArray,
+          partsOfSpeech: {
+            create: data.selectedParts.map((part) => ({
+              value: part,
+              label: PARTS_OF_SPEECH_MAP[part] || part
+            }))
+          },
+          exampleSentences: {
+            create: cleanSentences.map((sentence) => ({
+              content: sentence
+            }))
+          },
+          definitions: {
+            create: cleanDefinitions.map((def) => ({
+              content: def
+            }))
+          }
+        }
+      })
+    })
+
+    revalidatePath('/')
+    revalidatePath('/words')
+    revalidatePath('/study', 'layout')
+
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to update word:", error)
+    return { success: false, error: "Database error occurred while updating the word" }
+  }
+}
+
 export async function deleteWordAction(id: number) {
   try {
     await prisma.word.delete({

@@ -18,6 +18,8 @@ export default async function Page() {
   const words = await prisma.word.findMany({
     include: {
       partsOfSpeech: true, // We need this to show the "Noun", "Adj" badges
+      exampleSentences: true,
+      definitions: true,
     },
     orderBy: {
       createdAt: 'desc' // Show newest words first

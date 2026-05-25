@@ -15,7 +15,7 @@ export function useSentence(initialState: string[] = [""]) {
   
   const remove = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index))
   
-  const reset = () => setItems([""])
+  const reset = (newItems: string[] = [""]) => setItems(newItems)
 
   return { items, add, update, remove, reset }
 }

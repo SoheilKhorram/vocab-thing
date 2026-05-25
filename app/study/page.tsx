@@ -23,7 +23,10 @@ export default async function StudyDashboard() {
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 px-4">
         <SidebarTrigger className="-ms-1" />
-        <Separator orientation="vertical" className="me-2 h-4" />
+        <Separator
+          orientation="vertical"
+          className="me-2 data-[orientation=vertical]:h-4 data-[orientation=vertical]:self-auto"
+        />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
@@ -34,7 +37,7 @@ export default async function StudyDashboard() {
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="min-h-screen flex flex-col flex-1 rounded-xl bg-muted/30 p-6">
+        <div className="min-h-screen flex flex-col flex-1 rounded-xl bg-muted/30 md:min-h-min p-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold tracking-tight">Your Lessons</h1>
             <p className="text-muted-foreground text-sm mt-1">
@@ -48,7 +51,7 @@ export default async function StudyDashboard() {
                 <div className="flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm p-5 hover:border-primary/50 transition-colors h-full relative overflow-hidden">
                   <BookOpen className="absolute -bottom-4 -right-4 h-24 w-24 text-muted/20 group-hover:text-primary/5 transition-colors duration-500 pointer-events-none" />
 
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between py-2">
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                         {lessonNumber}
