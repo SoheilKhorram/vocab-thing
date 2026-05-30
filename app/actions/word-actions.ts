@@ -1,7 +1,7 @@
-"use server"
+'use server'
 
-import prisma from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import prisma from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 
 type CreateWordInput = {
   englishTerm: string
@@ -9,58 +9,7 @@ type CreateWordInput = {
   selectedParts: string[]
   exampleSentences: string[]
   definitions: string[]
-}
-
-const PARTS_OF_SPEECH_MAP: Record<string, string> = {
-  verb: "v", noun: "n", adjective: "adj", adverb: "adv",
-  pronoun: "pron", preposition: "prep", conjunction: "conj", interjection: "inter",
-}
-
-export async function createWordAction(data: CreateWordInput) {
-  try {
-    // 1. Format the Persian translations (split by " - " as per your UI instructions)
-    const persianTranslationsArray = data.persianTranslation
-      .split("-")
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0)
-
-    // 2. Filter out any empty sentences or definitions
-    const cleanSentences = data.exampleSentences.filter(s => s.trim().length > 0)
-    const cleanDefinitions = data.definitions.filter(d => d.trim().length > 0)
-
-    // 3. Save to database using Prisma's nested creates
-    const newWord = await prisma.word.create({
-      data: {
-        englishTerm: data.englishTerm,
-        persianTranslations: persianTranslationsArray,
-        studyProgress: [0,0,0,0,0,0,0,0,0,0,0],
-        partsOfSpeech: {
-          create: data.selectedParts.map((part) => ({
-            value: part,
-            label: PARTS_OF_SPEECH_MAP[part] || part
-          }))
-        },
-        exampleSentences: {
-          create: cleanSentences.map((sentence) => ({
-            content: sentence
-          }))
-        },
-        definitions: {
-          create: cleanDefinitions.map((def) => ({
-            content: def
-          }))
-        }
-      }
-    })
-
-    // Optional: Refresh the page cache if you display these words elsewhere
-    revalidatePath('/') 
-
-    return { success: true, wordId: newWord.id }
-  } catch (error) {
-    console.error("Failed to save word:", error)
-    return { success: false, error: "Database error occurred" }
-  }
+  lessonId: string
 }
 
 type UpdateWordInput = {
@@ -70,17 +19,81 @@ type UpdateWordInput = {
   selectedParts: string[]
   exampleSentences: string[]
   definitions: string[]
+  lessonId: number
+}
+
+const PARTS_OF_SPEECH_MAP: Record<string, string> = {
+  verb: 'v',
+  noun: 'n',
+  adjective: 'adj',
+  adverb: 'adv',
+  pronoun: 'pron',
+  preposition: 'prep',
+  conjunction: 'conj',
+  interjection: 'inter',
+}
+
+export async function createWordAction(data: CreateWordInput) {
+  try {
+    // 1. Format the Persian translations (split by " - " as per your UI instructions)
+    const persianTranslationsArray = data.persianTranslation
+      .split('-')
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0)
+
+    // 2. Filter out any empty sentences or definitions
+    const cleanSentences = data.exampleSentences.filter(
+      (s) => s.trim().length > 0,
+    )
+    const cleanDefinitions = data.definitions.filter((d) => d.trim().length > 0)
+
+    // 3. Save to database using Prisma's nested creates
+    const newWord = await prisma.word.create({
+      data: {
+        englishTerm: data.englishTerm,
+        persianTranslations: persianTranslationsArray,
+        studyProgress: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        lessonId: data.lessonId,
+        partsOfSpeech: {
+          create: data.selectedParts.map((part) => ({
+            value: part,
+            label: PARTS_OF_SPEECH_MAP[part] || part,
+          })),
+        },
+        exampleSentences: {
+          create: cleanSentences.map((sentence) => ({
+            content: sentence,
+          })),
+        },
+        definitions: {
+          create: cleanDefinitions.map((def) => ({
+            content: def,
+          })),
+        },
+      },
+    })
+
+    // Optional: Refresh the page cache if you display these words elsewhere
+    revalidatePath('/')
+
+    return { success: true, wordId: newWord.id }
+  } catch (error) {
+    console.error('Failed to save word:', error)
+    return { success: false, error: 'Database error occurred' }
+  }
 }
 
 export async function updateWordAction(data: UpdateWordInput) {
   try {
     const persianTranslationsArray = data.persianTranslation
-      .split("-")
+      .split('-')
       .map((t) => t.trim())
       .filter((t) => t.length > 0)
 
-    const cleanSentences = data.exampleSentences.filter(s => s.trim().length > 0)
-    const cleanDefinitions = data.definitions.filter(d => d.trim().length > 0)
+    const cleanSentences = data.exampleSentences.filter(
+      (s) => s.trim().length > 0,
+    )
+    const cleanDefinitions = data.definitions.filter((d) => d.trim().length > 0)
 
     await prisma.$transaction(async (tx) => {
       // Delete old relations
@@ -97,20 +110,20 @@ export async function updateWordAction(data: UpdateWordInput) {
           partsOfSpeech: {
             create: data.selectedParts.map((part) => ({
               value: part,
-              label: PARTS_OF_SPEECH_MAP[part] || part
-            }))
+              label: PARTS_OF_SPEECH_MAP[part] || part,
+            })),
           },
           exampleSentences: {
             create: cleanSentences.map((sentence) => ({
-              content: sentence
-            }))
+              content: sentence,
+            })),
           },
           definitions: {
             create: cleanDefinitions.map((def) => ({
-              content: def
-            }))
-          }
-        }
+              content: def,
+            })),
+          },
+        },
       })
     })
 
@@ -120,8 +133,11 @@ export async function updateWordAction(data: UpdateWordInput) {
 
     return { success: true }
   } catch (error) {
-    console.error("Failed to update word:", error)
-    return { success: false, error: "Database error occurred while updating the word" }
+    console.error('Failed to update word:', error)
+    return {
+      success: false,
+      error: 'Database error occurred while updating the word',
+    }
   }
 }
 
@@ -136,17 +152,20 @@ export async function deleteWordAction(id: number) {
 
     return { success: true }
   } catch (error) {
-    console.error("Failed to delete word:", error)
-    return { success: false, error: "Could not delete word from database" }
+    console.error('Failed to delete word:', error)
+    return { success: false, error: 'Could not delete word from database' }
   }
 }
 
-export async function updateWordProgressAction(id: number, studyProgress: number[]) {
+export async function updateWordProgressAction(
+  id: number,
+  studyProgress: number[],
+) {
   try {
     // Tell Prisma to update the specific word with the new progress array
     await prisma.word.update({
       where: { id },
-      data: { studyProgress }
+      data: { studyProgress },
     })
 
     // Clear the Next.js cache so the updated boxes show up immediately
@@ -155,7 +174,10 @@ export async function updateWordProgressAction(id: number, studyProgress: number
 
     return { success: true }
   } catch (error) {
-    console.error("Failed to update progress:", error)
-    return { success: false, error: "Failed to save study progress to database." }
+    console.error('Failed to update progress:', error)
+    return {
+      success: false,
+      error: 'Failed to save study progress to database.',
+    }
   }
 }

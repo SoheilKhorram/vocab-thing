@@ -11,6 +11,7 @@ import { Save, Loader2 } from "lucide-react"
 import { createWordAction } from "@/app/actions/word-actions"
 import { useSentence } from "../hooks/use-sentence"
 import { SentencesSection } from './sentences-section'
+import { LessonCombobox } from './lesson-combobox'
 
 type PartOfSpeechType = "noun" | "verb" | "adjective" | "adverb" | "pronoun" | "preposition" | "conjunction" | "interjection"
 
@@ -26,6 +27,8 @@ export function WordForm() {
   const [isPending, startTransition] = useTransition()
 
   const [selectedParts, setSelectedParts] = useState<Set<PartOfSpeechType>>(new Set())
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null)
+
   const sentences = useSentence()
   const definitions = useSentence()
 
@@ -39,6 +42,11 @@ export function WordForm() {
   }
 
   const clientAction = (formData: FormData) => {
+    if (!selectedLessonId) {
+      alert('Please select or create a lesson first.')
+      return
+    }
+
     startTransition(async () => {
       const payload = {
         englishTerm: formData.get("english-term") as string,
@@ -46,6 +54,7 @@ export function WordForm() {
         selectedParts: Array.from(selectedParts),
         exampleSentences: sentences.items,
         definitions: definitions.items,
+        lessonId: selectedLessonId,
       }
 
       const result = await createWordAction(payload)
@@ -66,7 +75,7 @@ export function WordForm() {
     <form ref={formRef} action={clientAction} className="min-h-screen flex flex-col flex-1 rounded-xl bg-muted/50 md:min-h-min p-4">
       <FieldGroup className="min-h-min">
         <FieldSet>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <Field>
               <FieldLabel htmlFor="english-term">English Term</FieldLabel>
               <Input name="english-term" id="english-term" required />
@@ -88,6 +97,14 @@ export function WordForm() {
               <FieldLabel htmlFor="persian-translation">Persian Translation</FieldLabel>
               <Input name="persian-translation" id="persian-translation" />
               <FieldDescription>Separate different meanings by &quot; - &quot;</FieldDescription>
+            </Field>
+
+            <Field className="flex flex-col gap-2">
+              <FieldLabel>Lesson</FieldLabel>
+              <LessonCombobox
+                value={selectedLessonId}
+                onValueChange={setSelectedLessonId}
+              />
             </Field>
           </div>
 
