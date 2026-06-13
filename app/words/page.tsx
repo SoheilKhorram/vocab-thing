@@ -17,12 +17,13 @@ export default async function Page() {
   // 1. Fetch the data securely on the server
   const words = await prisma.word.findMany({
     include: {
-      partsOfSpeech: true, // We need this to show the "Noun", "Adj" badges
+      partsOfSpeech: true,
       exampleSentences: true,
       definitions: true,
+      lesson: true,
     },
     orderBy: {
-      createdAt: 'desc' // Show newest words first
+      createdAt: 'desc'
     }
   })
 
@@ -77,7 +78,13 @@ export default async function Page() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 gap-4 auto-rows-max">
               {words.map((word) => (
-                <WordCard key={word.id} word={word} />
+                <WordCard
+                  key={word.id}
+                  word={{
+                    ...word,
+                    lessonName: word.lesson.name,
+                  }}
+                />
               ))}
             </div>
           )}

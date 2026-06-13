@@ -30,8 +30,13 @@ export function LessonCombobox({ value, onValueChange }: LessonComboboxProps) {
       const result = await getLessonsAction()
       if (result.success && result.data) {
         setLessons(result.data)
-        onValueChange(result.data[0].id)
-        setSortingValue(result.data[0].id)
+        // Only auto-select the first lesson if no lesson is already selected
+        if (!value) {
+          onValueChange(result.data[0].id)
+          setSortingValue(result.data[0].id)
+        } else {
+          setSortingValue(value)
+        }
       }
     }
     fetchLessons()

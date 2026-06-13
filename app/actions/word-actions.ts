@@ -19,7 +19,7 @@ type UpdateWordInput = {
   selectedParts: string[]
   exampleSentences: string[]
   definitions: string[]
-  lessonId?: number
+  lessonId: string
 }
 
 const PARTS_OF_SPEECH_MAP: Record<string, string> = {
@@ -114,6 +114,7 @@ export async function updateWordAction(data: UpdateWordInput) {
         data: {
           englishTerm: data.englishTerm,
           persianTranslations: persianTranslationsArray,
+          lessonId: data.lessonId,
           partsOfSpeech: {
             create: data.selectedParts.map((part) => ({
               value: part,
