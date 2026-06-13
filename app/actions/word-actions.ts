@@ -19,7 +19,7 @@ type UpdateWordInput = {
   selectedParts: string[]
   exampleSentences: string[]
   definitions: string[]
-  lessonId: number
+  lessonId?: number
 }
 
 const PARTS_OF_SPEECH_MAP: Record<string, string> = {
@@ -71,12 +71,19 @@ export async function createWordAction(data: CreateWordInput) {
           })),
         },
       },
+      include: {
+        partsOfSpeech: true,
+        exampleSentences: true,
+        definitions: true,
+      },
     })
 
-    // Optional: Refresh the page cache if you display these words elsewhere
+    // Refresh the page caches
     revalidatePath('/')
+    revalidatePath('/add-words')
+    revalidatePath('/words')
 
-    return { success: true, wordId: newWord.id }
+    return { success: true, word: newWord }
   } catch (error) {
     console.error('Failed to save word:', error)
     return { success: false, error: 'Database error occurred' }
@@ -148,7 +155,8 @@ export async function deleteWordAction(id: number) {
     })
 
     // Refresh the page so the deleted word disappears from the grid
-    revalidatePath('/words') // Note: Change this path if your page is located somewhere else (e.g., '/')
+    revalidatePath('/words')
+    revalidatePath('/add-words')
 
     return { success: true }
   } catch (error) {
